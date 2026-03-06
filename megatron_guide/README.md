@@ -13,18 +13,29 @@ Each chapter follows the same structure:
 
 ## Chapters
 
+### Part I — Data & Preprocessing
 | # | Chapter | Description |
 |---|---------|-------------|
 | 0 | [Introduction & Codebase Overview](./ch00_introduction.md) | Project structure, two-component architecture (Megatron-LM vs Megatron Core), how to navigate the codebase |
-| 1 | [Data Preprocessing Pipeline](./ch01_data_preprocessing.md) | Raw text → tokenized binary datasets. Tokenizers, `preprocess_data.py`, IndexedDataset format |
-| 2 | [Data Loading & Dataset Construction](./ch02_data_loading.md) | How binary datasets become training batches. GPTDataset, blending, sampling, SFT and FIM datasets |
-| 3 | [Model Architecture Deep Dive](./ch03_model_architecture.md) | GPTModel internals: TransformerBlock, attention, MLP, MoE, and the TransformerSpec pattern |
-| 4 | [The Pretraining Loop](./ch04_pretraining_loop.md) | What happens when you run `torchrun pretrain_gpt.py`. The full training step from data to gradient update |
-| 5 | [Distributed Training & Parallelism](./ch05_distributed_training.md) | Tensor, pipeline, data, context, and expert parallelism. Process groups and communication patterns |
-| 6 | [Optimizers & Mixed Precision](./ch06_optimizers_mixed_precision.md) | Distributed optimizer (ZeRO), gradient clipping, FP16/BF16/FP8/FP4, activation recomputation |
-| 7 | [Checkpointing & Model Conversion](./ch07_checkpointing.md) | Saving/loading distributed checkpoints, HuggingFace ↔ Megatron conversion, checkpoint resharding |
-| 8 | [Post-Training: SFT & RLHF](./ch08_post_training.md) | Supervised fine-tuning datasets, GRPO reinforcement learning, the RL training loop |
-| 9 | [Model Optimization & Deployment](./ch09_optimization_deployment.md) | Quantization (FP8/FP4), pruning, knowledge distillation, EAGLE3 speculative decoding, model export |
+| 1 | [Data Preprocessing Pipeline](./ch01_data_preprocessing.md) | Raw text → tokenized binary datasets. Tokenizers, `preprocess_data.py`, IndexedDataset format (.bin/.idx) |
+| 2 | [Data Loading & Dataset Construction](./ch02_data_loading.md) | How binary datasets become training batches. GPTDataset three-index trick, blending, sampling |
+
+### Part II — Model & Training
+| # | Chapter | Description |
+|---|---------|-------------|
+| 3 | [Model Architecture Deep Dive](./ch03_model_architecture.md) | GPTModel internals: TransformerBlock, attention (GQA, MLA, RoPE), MLP (SwiGLU), MoE, the Spec pattern |
+| 4 | [The Pretraining Loop](./ch04_pretraining_loop.md) | `pretrain()` → `train()` → `train_step()` → forward/backward. Micro-batch accumulation, pipeline schedules |
+| 5 | [Distributed Training & Parallelism](./ch05_distributed_training.md) | 5D parallelism (TP/PP/DP/CP/EP). Deep dive on DP math: all-reduce, reduce-scatter, ZeRO stages |
+| 6 | [Optimizers, Mixed Precision & Memory](./ch06_optimizers_mixed_precision.md) | Distributed optimizer, three-copy pattern, FP16/BF16/FP8, gradient clipping, Adam/Muon, LR scheduling, activation recomputation |
+| 7 | [Checkpointing & Model Conversion](./ch07_checkpointing_conversion.md) | ShardedTensor, distributed save/load, checkpoint resharding magic, HuggingFace ↔ Megatron conversion, async saving |
+
+### Part III — Post-Training (Interview Focus)
+| # | Chapter | Description |
+|---|---------|-------------|
+| 8 | [Post-Training: SFT & LoRA](./ch08_post_training_sft.md) | SFT datasets (conversation packing, cu_seqlens, loss masking), chat templates, LoRA/PEFT/QLoRA deep dive |
+| 9 | [Post-Training: RLHF & GRPO](./ch09_post_training_rlhf_grpo.md) | GRPO algorithm (math, advantages, clipped surrogate), agent/environment architecture, rollout collection, memory management |
+| 10 | [Post-Training: Quantization, Pruning & Distillation](./ch10_quantization_pruning_distillation.md) | PTQ/QAT (FP8, NVFP4), Minitron pruning, knowledge distillation, EAGLE3 speculative decoding |
+| 11 | [Model Export & Deployment](./ch11_export_deployment.md) | ModelOpt export pipeline, TRT-LLM/vLLM/SGLang targets, checkpoint format landscape, end-to-end examples |
 
 ## Quick Reference: The Training Lifecycle
 
@@ -58,12 +69,29 @@ Each chapter follows the same structure:
 │  Save/load distributed state, convert between formats      │
 │  Ch 7: megatron/core/dist_checkpointing/                   │
 ├─────────────────────────────────────────────────────────────┤
-│                    POST-TRAINING                            │
-│  SFT fine-tuning, GRPO/RLHF alignment                     │
-│  Ch 8: megatron/rl/, megatron/training/datasets/           │
+│               POST-TRAINING: SFT & LoRA                    │
+│  Conversation packing, loss masking, LoRA/PEFT             │
+│  Ch 8: megatron/training/datasets/, megatron/post_training/│
 ├─────────────────────────────────────────────────────────────┤
-│                    DEPLOYMENT                               │
-│  Quantize → Prune → Distill → Export → Serve              │
-│  Ch 9: examples/post_training/modelopt/                    │
+│               POST-TRAINING: RLHF & GRPO                   │
+│  GRPO algorithm, rollout collection, agent/environment     │
+│  Ch 9: megatron/rl/, train_rl.py                           │
+├─────────────────────────────────────────────────────────────┤
+│            QUANTIZATION, PRUNING & DISTILLATION             │
+│  PTQ/QAT, Minitron pruning, knowledge distillation         │
+│  Ch 10: examples/post_training/modelopt/                   │
+├─────────────────────────────────────────────────────────────┤
+│                MODEL EXPORT & DEPLOYMENT                    │
+│  Export → TRT-LLM / vLLM / SGLang → Serve                 │
+│  Ch 11: megatron/core/export/, ModelOpt                    │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+## Target Audience
+
+- ML engineers preparing for technical interviews at AI companies
+- Researchers looking to understand production training infrastructure
+- Engineers transitioning from small-scale to large-scale training
+
+**Assumed knowledge**: Basic deep learning (backprop, transformers, attention), Python/PyTorch.
+**Not required**: Prior experience with distributed training, parallelism strategies, or the Megatron codebase.
