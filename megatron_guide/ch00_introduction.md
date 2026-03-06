@@ -94,13 +94,21 @@ Stage 7: CHECKPOINTING
   megatron/core/dist_checkpointing/ → save/load/convert checkpoints
   Covered in: Chapter 7
 
-Stage 8: POST-TRAINING
-  megatron/rl/ + megatron/training/datasets/sft_dataset.py → SFT, RLHF
+Stage 8: POST-TRAINING (SFT & LoRA)
+  megatron/training/datasets/sft_dataset.py → supervised fine-tuning
   Covered in: Chapter 8
 
-Stage 9: DEPLOYMENT
-  examples/post_training/modelopt/ → quantize, prune, export
+Stage 9: POST-TRAINING (RLHF & GRPO)
+  megatron/rl/ + train_rl.py → reinforcement learning from human feedback
   Covered in: Chapter 9
+
+Stage 10: COMPRESSION (Quantization, Pruning, Distillation)
+  examples/post_training/modelopt/ → quantize, prune, distill
+  Covered in: Chapter 10
+
+Stage 11: DEPLOYMENT
+  megatron/core/export/ + ModelOpt → export to TRT-LLM/vLLM/SGLang
+  Covered in: Chapter 11
 ```
 
 ## Your First Training Loop: The "Hello World"
