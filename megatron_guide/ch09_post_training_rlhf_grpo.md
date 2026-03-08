@@ -548,10 +548,10 @@ is_weights = torch.min(is_weights, truncation_coef)  # Cap the correction
 
 | | PPO | GRPO |
 |--|-----|------|
-| Models needed | 4 (policy, ref, reward, value) | 2 (policy, ref) |
-| Reward signal | Learned reward model | Verifiable rewards (math, code) |
+| Models needed | 4 (policy, ref, reward, value) | 2 (policy, reward, ref) |
+| Reward signal | (depend on task) | (depend on task) |
 | Critic | Value model estimates V(s) | Group statistics replace critic |
-| Memory | ~4× model size | ~2× model size |
+| Memory | ~3-4× model size | ~2-3× model size |
 | Best for | General preference alignment | Verifiable reasoning tasks |
 
 ### The GRPO Advantage Formula
